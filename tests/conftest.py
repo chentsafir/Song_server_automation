@@ -1,4 +1,6 @@
 import pytest
+from infra.logger import logger
+import logging
 
 from logic.users import UserLogic
 from logic.songs import SongLogic
@@ -7,8 +9,8 @@ from logic.admin import AdminLogic
 
 @pytest.fixture(scope="function")
 def user_logic():
-    user_logic = UserLogic()
-    yield user_logic
+    user_logic1 = UserLogic()
+    yield user_logic1
 
     #clean up after test
     admin=AdminLogic()
@@ -18,8 +20,8 @@ def user_logic():
 
 @pytest.fixture(scope="function")
 def song_logic():
-    song_logic = SongLogic()
-    yield song_logic
+    song_logic1 = SongLogic()
+    yield song_logic1
 
     #clean up after test
     admin=AdminLogic()
@@ -29,10 +31,11 @@ def song_logic():
 
 @pytest.fixture(scope="function")
 def playlist_logic():
-    playlist_logic = PlaylistLogic
-    yield playlist_logic
+    playlist_logic1 = PlaylistLogic
+    yield playlist_logic1
 
     # clean up after test
     admin = AdminLogic()
     admin.delete_all_users()
     admin.delete_all_songs()
+
