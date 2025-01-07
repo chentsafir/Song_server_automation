@@ -1,6 +1,4 @@
 import pytest
-from infra.logger import logger
-import logging
 
 from logic.users import UserLogic
 from logic.songs import SongLogic
