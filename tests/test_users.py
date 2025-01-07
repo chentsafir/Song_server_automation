@@ -14,7 +14,7 @@ from tests.conftest import song_logic
 
 
 
-# test add user (sanity test)
+# test add user
 def test_add_user(user_logic ):
 # add new user named chen
     logger.info("creating new first user named chen")
@@ -34,6 +34,62 @@ def test_add_user(user_logic ):
     expected_user_name = "chen"
     assert expected_user_name == response_data["data"]["user_name"], f"Expected user name {expected_user_name}  "
     logger.info("the user chen has name (chen)")
+
+
+
+#test add playlist
+def test_add_playlist(user_logic , song_logic , playlist_logic):
+    # add new user named chen
+    logger.info("creating new first user named chen")
+    new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
+    assert new_user1.status_code == 200, "Expected status code 200"
+    logger.info("user named chen created")
+
+    #add playlist to chen
+    logger.info("add playlist named vibe to chen playlists")
+    add_playlist=user_logic.add_playlist(user_name="chen" , user_password="pass111" , playlist_name="vibe")
+    assert add_playlist.status_code==200 , f"Expected for status code 200 but get: {add_playlist.status_code}"
+    logger.info("status code for add playlist is 200")
+
+    #get user
+    logger.info("get user data to see if playlist vibe is in chen playlists")
+    get_user=user_logic.get_user("chen")
+    assert get_user.status_code==200 , f"Expected for status code 200 but get: {get_user.status_code}"
+    response_data=get_user.json()
+    assert "vibe" in response_data["data"]["playlists"]
+    logger.info("playlist named vibe add to chen's playlists")
+
+
+
+#test add friend
+def test_add_friend(user_logic,song_logic,playlist_logic):
+    # add new user named chen
+    logger.info("creating new first user named chen")
+    new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
+    assert new_user1.status_code == 200, f"Expected status code 200 but get: {new_user1.status_code}"
+    logger.info("user named chen created")
+
+    # add new user named avi
+    logger.info("creating new second user named avi")
+    new_user2 = user_logic.add_user(user_name="avi", user_password="pass222")
+    assert new_user2.status_code == 200, f"Expected status code 200 but get: {new_user2.status_code}"
+    logger.info("user named avi created")
+
+    #add friend
+    logger.info("add avi to chen's friends")
+    add_friend=user_logic.add_friend(user_name="chen" , user_password="pass111" , friend_name="avi")
+    assert add_friend.status_code==200 , f"Expected status code 200 but get: {add_friend.status_code}"
+    logger.info("status code 200 for add friend")
+
+    #get user chen and check
+    logger.info("get user chen and check if avi is in chen's friends")
+    get_user=user_logic.get_user("chen")
+    assert get_user.status_code==200 , f"Expected for status code 200 but get: {get_user.status_code}"
+    response_data=get_user.json()
+    assert "avi" in response_data["data"]["friends"]
+    logger.info("avi added to chen's friends")
+
+
 
 
 
@@ -74,7 +130,7 @@ def test_add_2_users_with_the_same_name_case_sensitive(user_logic):
 
 
 # TODO
-pytest.xfail(reason="Bug: System allows add empty usernames")
+@pytest.mark.xfail(reason="Bug: System allows add empty usernames")
 # 2. every new user in the system has name (check if i create user with empty name is valid)
 def test_user_has_name(user_logic):
     logger.info("Starting test: user_has_name")
@@ -159,7 +215,7 @@ def test_add_play_list_with_wrong_pass(user_logic):
     assert 'error' in add_playlist.text, "Expected User messege - password incorrect  , and not add vibe to chen's playlists , but actual added"
 
 
-#@pytest.mark.xfail(reason="Bug: System not allow to add friend with wrong password but status code is 200 instead 500 ")
+@pytest.mark.xfail(reason="Bug: System not allow to add friend with wrong password but status code is 200 instead 500 ")
 # 3. user add friend with wrong pass
 def test_add_friend_with_wrong_pass(user_logic):
     # add new user named chen
@@ -187,7 +243,7 @@ def test_add_friend_with_wrong_pass(user_logic):
 
 
 # 4. add 2 friends to the same user friends lists
-def test_add_friend(user_logic):
+def test_add_two_friends(user_logic):
     logger.info("Starting test: test_add_friend")
 
     # add new user name chen

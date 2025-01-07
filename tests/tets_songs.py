@@ -11,6 +11,22 @@ from tests.conftest import song_logic
 
 
 
+@pytest.mark.xfail(reason="Bug: System not allow to add song to the system (return status code 400 and dont add the song)."
+                          " also there is bug in the get_song method, when there is no song found in the system the status code is 200  ")
+#test add song
+def test_add_song(user_logic,song_logic,playlist_logic):
+    # add song to the system
+    logger.info("add new song named 505 of Arctic monkeys")
+    add_song = song_logic.add_song(song_title="505", song_performer="Arctic Monkeys", song_genre="Rock",song_year="2007")
+    get_song = song_logic.get_song(song_title="505")
+    assert get_song.status_code == 200, "Expected status code 200"
+    print(".")  ##just to evaluate the bug
+    assert add_song.status_code == 200, f"Expected status code 200 but get {add_song.status_code}"
+    logger.info(" the song 505 of Arctic monkeys added to the system")
+
+
+
+
 
 
 
@@ -21,16 +37,15 @@ def test_upvote_with_wrong_pass(user_logic, song_logic, playlist_logic):
     # add new user named chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
-    assert new_user1.status_code == 200, "Expected status code 200"
+    assert new_user1.status_code == 200, f"Expected status code 200 ,but get: {new_user1.status_code}"
     logger.info("user named chen created")
 
     #add song to the system
     logger.info("add new song named 505 of Arctic monkeys")
     add_song = song_logic.add_song(song_title="505", song_performer="Arctic Monkeys", song_genre="Rock",song_year="2007")
+    assert add_song.status_code == 200, f"Expected status code 200 but get {add_song.status_code}"
     get_song=song_logic.get_song(song_title="505")
     assert get_song.status_code==200, "Expected status code 200"
-    print(".") ##just to evaluate the bug
-    assert add_song.status_code==200 , f"Expected status code 200 but get {add_song.status_code}"
     logger.info(" the song 505 of Arctic monkeys added to the system")
 
     # create new playlist name vibe
