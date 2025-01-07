@@ -14,21 +14,22 @@ class CrudApi:
         url = f"{self.url}/{endpoint}"
         r = requests.request('GET', url=url, params=params , headers={'accept': 'text/plain'})  # requests.get will not send query parameters if param=None
         return r
+        # Make a POST request to the specified endpoint
 
-    # Make a POST request to the specified endpoint
     def post(self, endpoint: str, data=None, headers=None):
         url = f"{self.url}/{endpoint}"
-        r = requests.request('POST', url=url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        r = requests.request('POST', url=url, data=data, headers={'Content-Type': 'application/json'})
         return r
+
 
     # Make a PUT request to the specified endpoint
     def put(self, endpoint: str, data=None, headers=None):
         url = f"{self.url}/{endpoint}"
-        r = requests.request('PUT', url=url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        r = requests.request('PUT', url=url, data=data, headers={'Content-Type': 'application/json'})
         return r
 
     # Delete request to the specified endpoint
     def delete(self, endpoint: str, data=None, headers=None):
         url = f"{self.url}/{endpoint}"
-        r = requests.request('DELETE', url=url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        r = requests.request('DELETE', url=url, data=data, headers={'Content-Type': 'application/json'})
         return r

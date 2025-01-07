@@ -7,6 +7,7 @@ def test_add_song_to_playlist(user_logic,song_logic,playlist_logic):
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
     assert new_user1.status_code == 200, f"Expected status code 200 ,but get: {new_user1.status_code}"
+
     logger.info("user named chen created")
 
     # create new playlist name vibe

@@ -2,62 +2,58 @@ import re
 from infra.logger import logger
 import pytest
 
+from logic.user_management import User
 from tests.conftest import song_logic
 
 
-
-
-
-
 # test add user
-def test_add_user(user_logic ):
-# add new user named chen
+def test_add_user(user_logic):
+    # add new user named chen
     logger.info("creating new first user named chen")
-    new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
-    assert new_user1.status_code == 200, "Expected status code 200"
+    user = User(user_name="chen", user_password="pass111")
+    r1 = user_logic.add_user(user_data=user)
+    assert r1.status_code == 200, "Expected status code 200"
     logger.info("user named chen created")
 
     # get user name chen
     logger.info("get chen detail")
-    get_user = user_logic.get_user(user_name="chen")
-    assert get_user.status_code == 200, "Expected status code 200"
+    r2 = user_logic.get_user(user_data=user)
+
+    user2 = r2.dAta.update_data()  ## to implement update_data in user class
+    assert r2.status_code == 200, "Expected status code 200"
     logger.info("user detail is responded")
 
     # check that the name of chen in system is chen
-    logger.info("check if user has name")
-    response_data = get_user.json()
-    expected_user_name = "chen"
-    assert expected_user_name == response_data["data"]["user_name"], f"Expected user name {expected_user_name}  "
+    logger.info("check if user has name = chen")
+    assert user.user_name == LINE 22, f"Expected user name {expected_user_name}" #ניגש ישירות לשם בישות ששמרנו
     logger.info("the user chen has name (chen)")
 
 
-
-#test add playlist
-def test_add_playlist(user_logic , song_logic , playlist_logic):
+# test add playlist
+def test_add_playlist(user_logic, song_logic, playlist_logic):
     # add new user named chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
     assert new_user1.status_code == 200, "Expected status code 200"
     logger.info("user named chen created")
 
-    #add playlist to chen
+    # add playlist to chen
     logger.info("add playlist named vibe to chen playlists")
-    add_playlist=user_logic.add_playlist(user_name="chen" , user_password="pass111" , playlist_name="vibe")
-    assert add_playlist.status_code==200 , f"Expected for status code 200 but get: {add_playlist.status_code}"
+    add_playlist = user_logic.add_playlist(user_name="chen", user_password="pass111", playlist_name="vibe")
+    assert add_playlist.status_code == 200, f"Expected for status code 200 but get: {add_playlist.status_code}"
     logger.info("status code for add playlist is 200")
 
-    #get user
+    # get user
     logger.info("get user data to see if playlist vibe is in chen playlists")
-    get_user=user_logic.get_user("chen")
-    assert get_user.status_code==200 , f"Expected for status code 200 but get: {get_user.status_code}"
-    response_data=get_user.json()
+    get_user = user_logic.get_user("chen")
+    assert get_user.status_code == 200, f"Expected for status code 200 but get: {get_user.status_code}"
+    response_data = get_user.json()
     assert "vibe" in response_data["data"]["playlists"]
     logger.info("playlist named vibe add to chen's playlists")
 
 
-
-#test add friend
-def test_add_friend(user_logic,song_logic,playlist_logic):
+# test add friend
+def test_add_friend(user_logic, song_logic, playlist_logic):
     # add new user named chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
@@ -70,22 +66,19 @@ def test_add_friend(user_logic,song_logic,playlist_logic):
     assert new_user2.status_code == 200, f"Expected status code 200 but get: {new_user2.status_code}"
     logger.info("user named avi created")
 
-    #add friend
+    # add friend
     logger.info("add avi to chen's friends")
-    add_friend=user_logic.add_friend(user_name="chen" , user_password="pass111" , friend_name="avi")
-    assert add_friend.status_code==200 , f"Expected status code 200 but get: {add_friend.status_code}"
+    add_friend = user_logic.add_friend(user_name="chen", user_password="pass111", friend_name="avi")
+    assert add_friend.status_code == 200, f"Expected status code 200 but get: {add_friend.status_code}"
     logger.info("status code 200 for add friend")
 
-    #get user chen and check
+    # get user chen and check
     logger.info("get user chen and check if avi is in chen's friends")
-    get_user=user_logic.get_user("chen")
-    assert get_user.status_code==200 , f"Expected for status code 200 but get: {get_user.status_code}"
-    response_data=get_user.json()
+    get_user = user_logic.get_user("chen")
+    assert get_user.status_code == 200, f"Expected for status code 200 but get: {get_user.status_code}"
+    response_data = get_user.json()
     assert "avi" in response_data["data"]["friends"]
     logger.info("avi added to chen's friends")
-
-
-
 
 
 @pytest.mark.xfail(reason="Bug: System allows duplicate usernames")
@@ -141,7 +134,6 @@ def test_user_has_name(user_logic):
     get_user = user_logic.get_user(user_name="")
     assert get_user.status_code == 400, "Expected status code 400"
     logger.info("there is not user with empty name")
-
 
 
 # 2. every new user in the system has emty list of friends
@@ -231,10 +223,9 @@ def test_add_friend_with_wrong_pass(user_logic):
     assert not re.match(r"^2\d{2}$",
                         str(add_friend.status_code)), f"to add friend with wrong user password status code should be 500 but get: {add_friend.status_code} "
     # assert add_friend.status_code ==500, f"to add friend with wrong user password status code should be 500 but get: {add_friend.status_code} "
-    logger.info("the response status code is 500") ##why 500 and not 400?
+    logger.info("the response status code is 500")  ##why 500 and not 400?
     assert 'error' in add_friend.text, "Expected User messege - password incorrect  , and not add avi to chen's friend , but actual added "  ####check it again (remove the assert status code to see th e problem)
     logger.info("avi not added to chen's friends")
-
 
 
 # 4. add 2 friends to the same user friends lists
@@ -244,25 +235,25 @@ def test_add_two_friends(user_logic):
     # add new user name chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
-    assert new_user1.status_code == 200 , "Expected status code 200"
+    assert new_user1.status_code == 200, "Expected status code 200"
     logger.info("user named chen created")
 
     # add new user name avi
     logger.info("creating new second user named avi")
     new_user2 = user_logic.add_user(user_name="avi", user_password="pass222")
-    assert new_user2.status_code == 200 , "Expected status code 200"
+    assert new_user2.status_code == 200, "Expected status code 200"
     logger.info("user named avi created")
 
     # add new user name joe
     logger.info("creating new third user named joe")
     new_user3 = user_logic.add_user(user_name="joe", user_password="pass333")
-    assert new_user3.status_code == 200 , "Expected status code 200"
+    assert new_user3.status_code == 200, "Expected status code 200"
     logger.info("user named joe created")
 
     # add avi to chens friends
     logger.info("add avi to chen's friends")
     add_freind = user_logic.add_friend(friend_name="avi", user_name="chen", user_password="pass111")
-    assert add_freind.status_code == 200 ,"Expected status code 200"
+    assert add_freind.status_code == 200, "Expected status code 200"
     logger.info("avi added to chen's friends")
 
     # check that avi is in chen friends
@@ -277,18 +268,17 @@ def test_add_two_friends(user_logic):
     # add joe to chens friends
     logger.info("add joe to chen's friends")
     add_freind2 = user_logic.add_friend(friend_name="joe", user_name="chen", user_password="pass111")
-    assert add_freind2.status_code == 200 , "Expected status code 200"
+    assert add_freind2.status_code == 200, "Expected status code 200"
     logger.info("joe added to chen's friends")
 
     # check that joe is in chen friends
     logger.info("check if joe is in chen's friends")
     get_user = user_logic.get_user("chen")
-    assert get_user.status_code == 200 , "Expected status code 200"
+    assert get_user.status_code == 200, "Expected status code 200"
     response_data = get_user.json()
     print(response_data)
     assert "joe" in response_data["data"]["friends"]
     logger.info("joe is in chen's friends")
-
 
 
 # 4. add the same friend to chen's friends list
@@ -317,7 +307,7 @@ def test_add_the_same_friend(user_logic):
     assert add_freind1.status_code == 200, f"Expected status code 200 but actual get {add_freind1.status_code}"
     logger.info("avi added to chen's friends")
 
-    #check that the length of friends lists of chen's is 1 (avi not added twice)
+    # check that the length of friends lists of chen's is 1 (avi not added twice)
     logger.info("check if the length of friends lists of chen's is 1")
     get_user = user_logic.get_user("chen")
     assert get_user.status_code == 200, "Expected status code 200"
@@ -327,9 +317,8 @@ def test_add_the_same_friend(user_logic):
     logger.info("avi added once")
 
 
-
 # 5. create 2 playlists to the same user
-def test_add_two_playlist_to_user(user_logic,song_logic , playlist_logic):
+def test_add_two_playlist_to_user(user_logic, song_logic, playlist_logic):
     # add new user name chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
@@ -348,65 +337,60 @@ def test_add_two_playlist_to_user(user_logic,song_logic , playlist_logic):
     assert add_playlist2.status_code == 200, f"Expected status code 200 but get: {add_playlist2.status_code} "
     logger.info("creating new playlist name chill succeed")
 
-    #check that vibe and chill is in the playlists list
+    # check that vibe and chill is in the playlists list
     logger.info("get chen details and check if vibe and chill is in the playlists list ")
-    get_user=user_logic.get_user(user_name="chen")
-    assert get_user.status_code==200 , f"Expected status code 200 but get: {get_user.status_code} "
-    response_data=get_user.json()
-    assert "chill" in  response_data["data"]["playlists"] , "Ecpected chill is in chen's playlists , but it isn't"
+    get_user = user_logic.get_user(user_name="chen")
+    assert get_user.status_code == 200, f"Expected status code 200 but get: {get_user.status_code} "
+    response_data = get_user.json()
+    assert "chill" in response_data["data"]["playlists"], "Ecpected chill is in chen's playlists , but it isn't"
     logger.info("chill is in chen's playlists")
     assert "vibe" in response_data["data"]["playlists"], "Ecpected vibe is in chen's playlists , but it isn't"
     logger.info("vibe is in chen's playlists")
 
 
-#10. the password of user not return in the user data
-def test_user_data_is_safe(user_logic,song_logic,playlist_logic):
+# 10. the password of user not return in the user data
+def test_user_data_is_safe(user_logic, song_logic, playlist_logic):
     # add new user name chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
     assert new_user1.status_code == 200, "Expected status code 200"
     logger.info("user named chen created")
 
-    #get user data and check if the password is return in the data response
+    # get user data and check if the password is return in the data response
     logger.info("check the response from get user")
-    get_user=user_logic.get_user(user_name="chen")
-    assert get_user.status_code==200 , "Expected status code 200"
-    response_data=get_user.json()
-    assert "password" not in response_data["data"].keys() , "Expected that the password dont show in the user data return from server"
+    get_user = user_logic.get_user(user_name="chen")
+    assert get_user.status_code == 200, "Expected status code 200"
+    response_data = get_user.json()
+    assert "password" not in response_data[
+        "data"].keys(), "Expected that the password dont show in the user data return from server"
     logger.info("The password dont show in the user data return from server")
 
 
-#11. the user can change pass and the new pass is updates in system
-def test_user_change_pass(user_logic , song_logic,playlist_logic):
+# 11. the user can change pass and the new pass is updates in system
+def test_user_change_pass(user_logic, song_logic, playlist_logic):
     # add new user name chen
     logger.info("creating new first user named chen")
     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
     assert new_user1.status_code == 200, "Expected status code 200"
     logger.info("user named chen created")
 
-    #user change pass
+    # user change pass
     logger.info("user chen want to change password")
-    change_pass=user_logic.change_password(user_name="chen" , user_password="pass111" , user_new_password="pass222")
-    assert change_pass.status_code==200 , f"Expected status code 200 but get: {change_pass.status_code}"
+    change_pass = user_logic.change_password(user_name="chen", user_password="pass111", user_new_password="pass222")
+    assert change_pass.status_code == 200, f"Expected status code 200 but get: {change_pass.status_code}"
     logger.info("status code for change pass is 200")
-    assert "erorr" not in change_pass.text , "Expected to action complit!, but get error"
+    assert "erorr" not in change_pass.text, "Expected to action complit!, but get error"
 
-    #do action that require pass and check if it done with the new pass
+    # do action that require pass and check if it done with the new pass
     logger.info("try to add playlist named vibe to chen playlists with the new pass")
-    add_playlist=user_logic.add_playlist(user_name="chen" , user_password="pass222" , playlist_name="vibe")
-    assert add_playlist.status_code==200 , f"Expected status code 200 but get: {add_playlist.status_code}"
+    add_playlist = user_logic.add_playlist(user_name="chen", user_password="pass222", playlist_name="vibe")
+    assert add_playlist.status_code == 200, f"Expected status code 200 but get: {add_playlist.status_code}"
     logger.info("status code for add playlist with new pass is 200")
 
-    #check if the vibe playlist is in the response data from server
+    # check if the vibe playlist is in the response data from server
     logger.info("check if the vibe playlist is in the response user data from server")
-    get_user=user_logic.get_user("chen")
-    response_user_data=get_user.json()
+    get_user = user_logic.get_user("chen")
+    response_user_data = get_user.json()
     assert "vibe" in response_user_data["data"]["playlists"]
-    logger.info("vibe add to the playlist so the new pass is update in the system") ## i think that we also need to check that the old pass is not active for the user. do i need to do it?
-
-
-
-
-
-
-
+    logger.info(
+        "vibe add to the playlist so the new pass is update in the system")  ## i think that we also need to check that the old pass is not active for the user. do i need to do it?
