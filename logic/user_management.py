@@ -13,11 +13,11 @@ class Friend(BaseModel):
 
 
 class User(BaseModel):
-    user_name: str = None
-    user_password: str = None
+    user_name: str
+    user_password: str
     user_new_password: str = None
-    playlist_list: [] = None
-    friend_list : [] = None
+    playlist_list: list[PlayList] = None
+    friend_list : list[Friend] = None
 
 
     def to_json(self):
