@@ -1,17 +1,16 @@
 import re
 from infra.logger import logger
 import pytest
-
 from logic.user_management import User
-from tests.conftest import song_logic
+
 
 
 # test add user
-def test_add_user(user_logic):
+def test_add_user(api):
     # add new user named chen
     logger.info("creating new first user named chen")
     user = User(user_name="chen", user_password="pass111")
-    r1 = user_logic.add_user(user_data=user)
+    r1 = .add_user(user_data=user)
     assert r1.status_code == 200, "Expected status code 200"
     logger.info("user named chen created")
 
@@ -25,7 +24,8 @@ def test_add_user(user_logic):
 
     # check that the name of chen in system is chen
     logger.info("check if user has name = chen")
-    assert user.user_name == LINE 22, f"Expected user name {expected_user_name}" #ניגש ישירות לשם בישות ששמרנו
+    assert user.user_name == LINE
+    22, f"Expected user name {expected_user_name}"  # ניגש ישירות לשם בישות ששמרנו
     logger.info("the user chen has name (chen)")
 
 

@@ -1,39 +1,19 @@
 import pytest
+from infra.config import Config
+from logic.song_server_api import ClientApi
 
-from logic.users import UserLogic
-from logic.songs import SongLogic
-from logic.playlists import PlaylistLogic
-from logic.admin import AdminLogic
 
-@pytest.fixture(scope="function")
-def user_logic():
-    user_logic1 = UserLogic()
-    yield user_logic1
-
+@pytest.fixture(scope="function", autouse=True) #autouse for teardown all function without call clean_up
+def clean_up():
+    yield
     #clean up after test
-    admin=AdminLogic()
+    admin = ClientApi(host=Config.HOST)
     admin.delete_all_users()
     admin.delete_all_songs()
+
 
 
 @pytest.fixture(scope="function")
-def song_logic():
-    song_logic1 = SongLogic()
-    yield song_logic1
-
-    #clean up after test
-    admin=AdminLogic()
-    admin.delete_all_users()
-    admin.delete_all_songs()
-
-
-@pytest.fixture(scope="function")
-def playlist_logic():
-    playlist_logic1 = PlaylistLogic
-    yield playlist_logic1
-
-    # clean up after test
-    admin = AdminLogic()
-    admin.delete_all_users()
-    admin.delete_all_songs()
-
+def api():
+    client_api = ClientApi(host=Config.HOST)
+    yield client_api

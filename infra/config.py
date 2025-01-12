@@ -9,5 +9,3 @@ class Config:
 
     # Reading the values from ini
     HOST = _config['Server']['HOST']
-    PORT = _config['Server']['PORT']
-    URL = f"{HOST}:{PORT}"
