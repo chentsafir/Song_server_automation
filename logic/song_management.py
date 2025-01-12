@@ -1,4 +1,3 @@
-import json
 from pydantic import BaseModel
 
 
@@ -15,6 +14,7 @@ class Songs(BaseModel):
 
 
     def to_json(self):
-        return (self.model_dump_json())
+        j=(self.model_dump_json())
+        return j
 
 
