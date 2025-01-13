@@ -1,9 +1,12 @@
 import pytest
 from infra.config import Config
 from logic.song_server_api import ClientApi
+from logic.user_management import User
 
 
-@pytest.fixture(scope="function", autouse=True) #autouse for teardown all function without call clean_up
+
+
+@pytest.fixture(scope="function", autouse=True) #autouse for teardown function without call clean_up
 def clean_up():
     yield
     #clean up after test

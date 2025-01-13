@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 import requests
 from infra.logger import logger
-
 
 HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 
 # Make a GET request to the specified endpoint
-def get(host, path, params=None, headers: dict | None = None):
+def get(host, path, params, headers: dict | None = None):
     try:
         r = requests.get(url='http://' + host + path, headers=HEADERS, params=params)
         return r
@@ -35,7 +36,7 @@ def put(host, path, json_data, headers: dict | None = None):
 # Delete request to the specified endpoint
 def delete(host, path):
     try:
-        r = requests.delete(url='http://' + host + path)
+        r = requests.delete(url= 'http://' + host + path)
         return r
     except requests.exceptions.RequestException as e:
         logger.error(f"Error during DELETE request to http://{host+path}: {str(e)}")

@@ -44,7 +44,7 @@ class ClientApi:
 
 
     # Add a new song to the system
-    def add_song(self, json_data):
+    def add_song_to_system(self, json_data):
         r = http_request.post(host=self.host, path="/songs/add_song", json_data=json_data, headers=CLIENT_HEADERS)
         return r
 
@@ -73,16 +73,16 @@ class ClientApi:
         return r
 
     # Add a specific song into a specific playlist
-    def add_song(self, json_data):
+    def add_song_to_playlist(self, json_data):
         r = http_request.post(host=self.host, path= "/playlists/add_song", json_data=json_data, headers=CLIENT_HEADERS)
         return
 
     # Delete all songs
     def delete_all_songs(self):
-        r = http_request.delete(path="/admin/delete_all_songs")
+        r = http_request.delete(host=self.host , path="/admin/delete_all_songs")
         return r
 
     # Delete all users
     def delete_all_users(self):
-        r = http_request.delete(path="/admin/delete_all_users")
+        r = http_request.delete(host=self.host ,path="/admin/delete_all_users")
         return r
