@@ -2,10 +2,10 @@ import re
 from infra.logger import logger
 import pytest
 from logic.user_management import User , PlayList , Friend
-from tests.conftest import api
 
 
 
+@pytest.mark.basic_test
 # test add user
 def test_add_user(api):
     # add new user named chen
@@ -21,11 +21,14 @@ def test_add_user(api):
     # r2 = api.get_user({'user_name' : user1.user_name}) ## there is another option but i didnt know if its good so i create function in user_management that return the name in dict
     assert r2.status_code == 200, f"Expected for status code 200 but get: {r2.status_code}"
     actual_user=user1.update_data(r2.json())
-    assert actual_user.user_name == user1.user_name
+    assert actual_user.user_name == user1.user_name , "Every new user should have user name"
+    # assert actual_user.user_password == user1.user_new_password, "Every new user should have password"
+    assert actual_user.friend_list == [] , "Every new user should have empty list of friend"
+    assert actual_user.friend_list == [], "Every new user should have empty list of playlist"
     logger.info("user named chen is added")
 
 
-
+@pytest.mark.basic_test
 # test add playlist
 def test_add_playlist(api):
     # add new user named chen
@@ -53,40 +56,55 @@ def test_add_playlist(api):
 
 
 
-
+@pytest.mark.basic_test
+@pytest.mark.parametrize("user_data,friend_data" ,[
+                         (
+                            {"name" : "chen" , "password" : "pass111"},
+                            {"name" : "adam" , "password" : "pass222"}
+                         ),
+                         (
+                            {"name": "ron", "password": "pass333"},
+                            {"name": "elad", "password": "pass444"}
+                         ),
+                         (
+                            {"name": "dani", "password": "pass555"},
+                            {"name": "tomer", "password": "pass666"}
+                         )
+])
 # test add friend
-def test_add_friend(api):
-    # add new user named chen
-    logger.info("creating new first user named chen")
-    user1 = User(user_name="chen", user_password="pass111")
+def test_add_friend(api , user_data , friend_data):
+    # add new first user1
+    logger.info(f"creating new first user named {user_data['name']}")
+    user1 = User(user_name=user_data["name"], user_password=user_data["password"])
     add_user1 = api.add_user(json_data=user1.to_json())
     assert add_user1.status_code == 200, f"Expected status code 200, but got: {add_user1.status_code}"
-    logger.info("user name chen with status code 200")
+    logger.info(f"user name  {user_data['name']} with status code 200")
 
-    # add new user named avi
-    logger.info("creating new second user named avi")
-    user2 = User(user_name="avi", user_password="pass222")
+    # add new second user2
+    logger.info(f"creating new second user named {friend_data["name"]}")
+    user2 = User(user_name=friend_data["name"], user_password=friend_data["password"])
     add_user2 = api.add_user(json_data=user2.to_json())
     assert add_user2.status_code == 200, f"Expected status code 200 but get: {add_user2.status_code}"
-    logger.info("user named avi created")
+    logger.info(f"user named {friend_data["name"]} created")
 
     # add friend
-    logger.info("add avi to chen's friends")
+    logger.info(f"add {friend_data["name"]} to {user_data['name']}'s friends")
     friend1=Friend(friend_name=user2.user_name)
     add_friend = api.add_friend(json_data=friend1.add_friend_params(user1))
     assert add_friend.status_code == 200, f"Expected status code 200 but get: {add_friend.status_code}"
     logger.info("status code 200 for add friend")
 
-    # get user named chen data
-    logger.info("get chen details")
+    # get user1 data
+    logger.info(f"get {user_data['name']} details")
     r2 = api.get_user(user1.convert_username_to_params_dict())
     assert r2.status_code == 200, f"Expected for status code 200 but get: {r2.status_code}"
     actual_user = user1.update_data(r2.json())
-    print("")
     assert friend1 in actual_user.friend_list
-    logger.info("friend named avi added to chen's friends")
+    logger.info(f"friend named {friend_data["name"]} added to {user_data['name']}'s friends")
 
 
+
+@pytest.mark.basic_test
 def test_change_password(api):
     # add new user named chen
     logger.info("creating new user named chen")
@@ -113,51 +131,86 @@ def test_change_password(api):
     logger.info("password changed to new password")
 
 
+@pytest.mark.xfail(run=True , reason= "bug - add user with the same name and system not case sensitive")
+@pytest.mark.Tests_according_to_requirements
+@pytest.mark.parametrize ("user_data1,user_data2" , [
+    (
+        {"name": "chen", "password": "pass111"} ,
+        {"name": "chen", "password": "pass111"}
+    ),
+    (
+        {"name": "chen", "password": "pass222"} ,
+        {"name": "Chen", "password": "pass222"}
+    )
+] )
+# 1. add 2 users with the same name (also check if the system is CaseSensitive) use parametrize
+def test_add_2_users_with_the_same_name(api , user_data1 , user_data2 ):
+    # add new user named chen
+    logger.info(f"creating new first user named {user_data1["name"]}")
+    user1 = User(user_name=user_data1["name"], user_password=user_data1["password"])
+    add_user1 = api.add_user(json_data=user1.to_json())
+    assert add_user1.status_code == 200, f"Expected status code 200, but got: {add_user1.status_code}"
+    logger.info(f"user name {user_data1["name"]} with status code 200")
 
-#
-#     # get user chen and check
-#     logger.info("get user chen and check if avi is in chen's friends")
-#     get_user = user_logic.get_user("chen")
-#     assert get_user.status_code == 200, f"Expected for status code 200 but get: {get_user.status_code}"
-#     response_data = get_user.json()
-#     assert "avi" in response_data["data"]["friends"]
-#     logger.info("avi added to chen's friends")
-#
-#
-# @pytest.mark.xfail(reason="Bug: System allows duplicate usernames")
-# # 1. add 2 users with the same name (functional test)
-# def test_add_2_users_with_the_same_name(user_logic):
-#     logger.info("Starting test: test_add_2_users_with_the_same_name")
-#
-#     # add new user named chen
-#     logger.info("creating new first user named chen")
-#     new_user1 = user_logic.add_user(user_name="chen", user_password="pass111")
-#     assert new_user1.status_code == 200, "Expected status code 200"
-#     logger.info("user named chen created")
-#
-#     # add second new user named chen
-#     logger.info("creating new second user named chen")
-#     new_user2 = user_logic.add_user(user_name="chen", user_password="pass111")
-#     assert new_user2.status_code == 500, "Expected status code 500"
-#     logger.info("user named chen created")
-#
-#
-# @pytest.mark.xfail(reason="Bug: System allows duplicate usernames (the system is not case sensitive")
-# # 1. add 2 users with the same name but the first name is in capital letters and second in lowercase (functional test)
-# def test_add_2_users_with_the_same_name_case_sensitive(user_logic):
-#     logger.info("Starting test: test_add_2_users_with_the_same_name_case_sensitive")
-#
-#     # add first new user named Chen
-#     logger.info("creating new first user named Chen")
-#     new_user1 = user_logic.add_user(user_name="Chen", user_password="pass111")
-#     assert new_user1.status_code == 200, "Expected status code 200"
-#     logger.info("user named Chen created")
-#
-#     # add second new user named chen
-#     logger.info("creating new second user named chen")
-#     new_user2 = user_logic.add_user(user_name="chen", user_password="pass111")
-#     assert new_user2.status_code == 500, "Expected status code 500"
-#     logger.info("user named chen created")
+    # get user named chen data
+    logger.info(f"get {user_data1["name"]} details")
+    r2 = api.get_user(user1.convert_username_to_params_dict())
+    # r2 = api.get_user({'user_name' : user1.user_name}) ## there is another option but i didnt know if its good so i create function in user_management that return the name in dict
+    assert r2.status_code == 200, f"Expected for status code 200 but get: {r2.status_code}"
+    actual_user=user1.update_data(r2.json())
+    assert actual_user.user_name == user1.user_name
+    logger.info(f"user named {user_data1["name"]} is added")
+
+    # add new second user named chen
+    logger.info(f"creating new second user named {user_data2["name"]}")
+    user1 = User(user_name=user_data2["name"], user_password=user_data2["password"])
+    add_user1 = api.add_user(json_data=user1.to_json())
+    assert add_user1.status_code != 200, f"Expected status code different from 200, but got: {add_user1.status_code}"
+    logger.info(f"user name {user_data2["name"]} with status code 200")
+
+    # get user named chen data
+    logger.info(f"get {user_data2["name"]} details")
+    r2 = api.get_user(user1.convert_username_to_params_dict())
+    # r2 = api.get_user({'user_name' : user1.user_name}) ## there is another option but i didnt know if its good so i create function in user_management that return the name in dict
+    assert r2.status_code != 200, f"Expected for status code different from 200 but get: {r2.status_code}"
+    actual_user=user1.update_data(r2.json())
+    assert actual_user.user_name == user1.user_name
+    logger.info(f"user named {user_data2["name"]} is added")
+
+
+
+
+@pytest.mark.xfail(run=True , reason= "bug - add user with empty name \ Invalid characters name")
+@pytest.mark.Tests_according_to_requirements
+@pytest.mark.parametrize ("user_data1" , [
+    (
+        {"name": "   ", "password": "pass111"}
+    ),
+    (
+        {"name": "!!!", "password": "pass222"}
+    ),
+    (
+        {"name": "@@@", "password": "pass333"}
+    )
+] )
+#2. every new user in the system has name (check if create user with empty name \ Invalid characters name  is valid)
+def test_user_has_name(api , user_data1):
+    # add new user with no name (@@@/!!!/  /"")
+    logger.info(f"creating new first user named {user_data1["name"]}")
+    user1 = User(user_name=user_data1["name"], user_password=user_data1["password"])
+    add_user1 = api.add_user(json_data=user1.to_json())
+    assert add_user1.status_code != 200, f"Expected status code different from 200, but got: {add_user1.status_code}"
+    logger.info(f"name {user_data1["name"]} with status code different from 200")
+
+    # get user1 data
+    logger.info(f"get {user_data1['name']} details to check if not added to system")
+    r2 = api.get_user(user1.convert_username_to_params_dict())
+    assert r2.status_code != 200, f"Expected for status code different from 200 but get: {r2.status_code}"
+    actual_user = user1.update_data(r2.json())
+    assert user_data1["name"] not in actual_user.user_name
+    logger.info(f" user {user_data1['name']} is not added to the system")
+
+
 #
 #
 # # TODO

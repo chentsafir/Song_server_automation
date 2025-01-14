@@ -23,7 +23,6 @@ class User(BaseModel):
         for key, value in data.items():
             if value is not None:
                 cleaned_data[key] = value
-        cleaned_data = json.dumps(cleaned_data)
         return cleaned_data
 
     def convert_username_to_params_dict(self):
@@ -41,14 +40,14 @@ class User(BaseModel):
         data = response_data.get("data", {})
 
         # Map server response fields to object fields
-        if "user_name" in data:
+        if "user_name" in data and not None:
             self.user_name = data["user_name"]
-        if "playlists" in data:
+        if "playlists" in data and not None:
             playlist_data = data["playlists"]
             self.playlist_list = []
             for playlist_name in playlist_data:
                 self.playlist_list.append(PlayList(playlist_name=playlist_name))
-        if "friends" in data:
+        if "friends" in data and not None:
             friends_data = data["friends"]
             self.friend_list = []
             for friend_name in friends_data:

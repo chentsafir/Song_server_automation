@@ -24,16 +24,21 @@ Chen Tsafir
 
 ## Installation
 1. Clone the repository:
-```bash
-git clone https://github.com/chentsafir/Song_server_automation.git
-cd Song_server_automation
-```
+    ```bash
+    git clone https://github.com/chentsafir/Song_server_automation.git
+    cd Song_server_automation
+    ```
 
-2.  Create a virtual environment:
-```bash
-virtualenv venv --python=3.6
-```
-3. Activate the virtual environment:
+2. Configure
+
+    under sources folder change the config.ini file to relevant Port
+
+
+3.  Create a virtual environment:
+    ```bash
+    virtualenv venv --python=3.12
+    ```
+4. Activate the virtual environment:
 
     windows:
     ```bash
@@ -43,10 +48,12 @@ virtualenv venv --python=3.6
     ```bash
         source venv/bin/activate
     ```
-4. Install requirements:
-```bash
-pip install -r requirements.txt
-```
-
-
+5. Install requirements:
+    ```bash
+    pip install -r requirements.txt
+    ```
+6. Run the tests 
+    ```bash
+    pytest -s        
+    ```
 

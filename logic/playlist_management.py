@@ -8,5 +8,5 @@ class PlayLists(BaseModel):
     song_title: str = None
 
     def to_json(self):
-        j=(self.model_dump_json())
+        j=(self.model_dump())
         return j

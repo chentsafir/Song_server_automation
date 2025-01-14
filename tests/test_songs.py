@@ -1,9 +1,10 @@
-from infra.logger import logger
 import pytest
-from logic.user_management import User , PlayList , Friend
+from infra.logger import logger
 from logic.song_management import Songs
 from tests.conftest import api
 
+
+@pytest.mark.basic_test
 #test add song
 def test_add_song(api):
     #add new song to system

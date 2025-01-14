@@ -16,15 +16,15 @@ class Songs(BaseModel):
         data = response_data.get("data", {})
 
         # Map server response fields to object fields
-        if "title" in data:
+        if "title" in data and not None:
             self.song_title = data["title"]
-        if "performer" in data:
+        if "performer" in data and not None:
             self.song_performer = data["performer"]
-        if "genre" in data:
+        if "genre" in data and not None:
             self.song_genre = data["genre"]
-        if "year" in data:
+        if "year" in data and not None:
             self.song_year = data["year"]
-        if "rating" in data:
+        if "rating" in data and not None:
             self.song_rating = data["rating"]
 
         return self
