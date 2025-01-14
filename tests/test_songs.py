@@ -1,6 +1,7 @@
 import pytest
 from infra.logger import logger
 from logic.song_management import Songs
+from logic.user_management import User , Friend , PlayList
 from tests.conftest import api
 
 
@@ -25,6 +26,35 @@ def test_add_song(api):
     assert actual_song.song_title == song1.song_title , f"Expecting for song title 505 but get:{actual_song.song_title} "
     logger.info("the song named 505 added")
 
+
+# @pytest.mark.basic_test
+# #test upvote song
+# def test_upvote_song(api):
+#     # add new user named chen
+#     logger.info("creating new first user named chen")
+#     user1 = User(user_name="chen", user_password="pass111")
+#     add_user1 = api.add_user(json_data=user1.to_json())
+#     assert add_user1.status_code == 200, f"Expected status code 200, but got: {add_user1.status_code}"
+#     logger.info("user name chen with status code 200")
+#
+#     # add new song to system
+#     logger.info("add new song named 505 of Arctic monkeys")
+#     song1 = Songs(song_genre="Rock", song_performer="arctic monkeys", song_title="505", song_year=2007)
+#     add_song1 = api.add_song_to_system(json_data=song1.to_json())
+#     assert add_song1.status_code == 200, f"Expected status code 200 but get {add_song1.status_code}"
+#     logger.info(" the status code for add 505 song is 200")
+#
+#     # add playlist to chen
+#     logger.info("add playlist named vibe to chen playlists")
+#     playlist1 = PlayList(playlist_name="vibe")
+#     add_playlist = api.add_playlist(json_data=playlist1.prepare_for_add_playlist(user1))
+#     assert add_playlist.status_code == 200, f"Expected for status code 200 but get: {add_playlist.status_code}"
+#     logger.info("status code for add playlist is 200")
+#
+#
+#
+#     #upvote for song in system
+#     upvote_song=api.upvote(json_data=song1.prepare_vote_request())
 
 
 

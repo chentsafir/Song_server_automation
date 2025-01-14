@@ -6,7 +6,7 @@ class Songs(BaseModel):
     song_title: str = None
     song_performer: str = None
     song_genre: str = None
-    song_year: int = None  # need to be int (in the swagger its str)
+    song_year: int = None  # need to be int (str in the swagger)
     song_rating: int = None
     rank: str = None
     op: str = None
@@ -56,8 +56,8 @@ class Songs(BaseModel):
             "song_title": self.song_title
         }
 
-    def prepare_ranked_songs_params(self):
-        """Prepares parameters for getting ranked songs."""
+    #Prepares parameters for getting ranked songs.
+    def prepare_get_ranked_songs_params(self):
         return {
             "rank": self.rank,
             "op": self.op
